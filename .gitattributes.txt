@@ -1,0 +1,8 @@
+# Normalizar fines de línea para todos los archivos
+* text=auto
+
+# Archivos binarios (no se aplicará normalización)
+*.png binary
+*.jpg binary
+*.jar binary
+*.zip binary

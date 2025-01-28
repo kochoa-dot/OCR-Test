@@ -5,6 +5,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.ocr.ui.OcrScreen
 import com.example.ocr.ui.theme.HomeScreen
+import com.example.ocr.ui.theme.ResultScreen
 
 @Composable
 fun OcrApp() {
@@ -16,6 +17,9 @@ fun OcrApp() {
         }
         composable("ocrScreen") {
             OcrScreen(navController = navController)
+        }
+        composable("resultScreen/{zipcode}") { backStackEntry ->
+            ResultScreen(backStackEntry = backStackEntry)
         }
     }
 }

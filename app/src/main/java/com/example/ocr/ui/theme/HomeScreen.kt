@@ -1,16 +1,8 @@
 package com.example.ocr.ui.theme
 
-import android.content.res.Resources
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,13 +16,11 @@ import com.example.ocr.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
-    var searchText by remember { mutableStateOf(TextFieldValue("")) }
+    var zipCode by remember { mutableStateOf(TextFieldValue("")) }
+    var errorMessage by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
-            /*TopAppBar(
-                //title = { Text("Buscar Manualmente") }
-            )*/
         }
     ) { paddingValues ->
         Box(
@@ -60,8 +50,8 @@ fun HomeScreen(navController: NavController) {
                 )
 
                 OutlinedTextField(
-                    value = searchText,
-                    onValueChange = { searchText = it },
+                    value = zipCode,
+                    onValueChange = { zipCode = it },
                     label = { Text("Escribe aquí para buscar") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -75,7 +65,13 @@ fun HomeScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Button(
-                        onClick = { /* Conexión a API de MagicLoops */ },
+                        onClick = {
+                            if (zipCode.text.isNotBlank() && zipCode.text.matches(Regex("\\d{5}"))) {
+                                navController.navigate("resultScreen/${zipCode.text}")
+                            } else {
+                                errorMessage = "Por favor, ingresa un código postal válido (5 dígitos)."
+                            }
+                        },
                         modifier = Modifier.padding(horizontal = 16.dp)
                     ) {
                         Text("Buscar")
@@ -87,6 +83,15 @@ fun HomeScreen(navController: NavController) {
                     ) {
                         Text("Escanear")
                     }
+                }
+
+                if (errorMessage.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
                 }
             }
         }

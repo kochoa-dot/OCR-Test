@@ -1,5 +1,6 @@
 package com.example.ocr
 
+import OcrApp
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -9,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Text
 import androidx.core.content.ContextCompat
 import com.example.ocr.ui.OcrScreen
+import com.example.ocr.ui.theme.OCRTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -16,9 +18,15 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            setContent { OcrScreen() }
+            setContent { OCRTheme {
+                OcrApp()
+            } }
         } else {
-            setContent { Text("Se requiere permiso de cámara para usar esta aplicación.") }
+            setContent {
+                OCRTheme {
+                    Text("Se requiere permiso de cámara para usar esta aplicación.")
+                }
+            }
         }
     }
 
@@ -30,7 +38,11 @@ class MainActivity : ComponentActivity() {
     private fun checkCameraPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_GRANTED) {
-            setContent { OcrScreen() }
+            setContent {
+                OCRTheme {
+                    OcrApp()
+                }
+            }
         } else {
             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }

@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
@@ -16,7 +17,7 @@ import com.example.ocr.ui.theme.CameraPreview
 
 @OptIn(ExperimentalGetImage::class)
 @Composable
-fun OcrScreen() {
+fun OcrScreen(navController: NavController) {
     var recognizedText by remember { mutableStateOf("") }
 
     val textRecognizer = remember {

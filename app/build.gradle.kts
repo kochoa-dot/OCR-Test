@@ -60,6 +60,8 @@ dependencies {
     implementation("androidx.compose.material3:material3-window-size-class:1.3.1")
     implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.4.0-alpha04")
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.runtime.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -84,4 +86,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
+
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
+    implementation("com.google.maps.android:maps-compose:2.11.0")
 }

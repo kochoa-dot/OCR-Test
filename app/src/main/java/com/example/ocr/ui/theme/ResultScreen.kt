@@ -9,6 +9,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import com.example.ocr.api.ApiResponse
 import com.example.ocr.api.RetrofitClient
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.*
+
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -19,11 +24,24 @@ fun ResultScreen(backStackEntry: NavBackStackEntry) {
     var error by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
 
+    val cameraPositionState = rememberCameraPositionState {
+        CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 5f)
+    }
+
     LaunchedEffect(zipCode) {
         scope.launch {
             try {
-                // Llama a la API con el país "us" y el código postal proporcionado
                 response = RetrofitClient.apiService.getZipCodeInfo("us", zipCode)
+                response?.places?.firstOrNull()?.let { place ->
+                    val latitude = place.latitude.toDoubleOrNull()
+                    val longitude = place.longitude.toDoubleOrNull()
+
+                    if (latitude != null && longitude != null) {
+                        cameraPositionState.animate(
+                            CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 10f)
+                        )
+                    }
+                }
             } catch (e: Exception) {
                 error = "Error al obtener datos: ${e.message}"
             }
@@ -37,31 +55,49 @@ fun ResultScreen(backStackEntry: NavBackStackEntry) {
             )
         }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentAlignment = Alignment.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (response != null) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                val place = response!!.places.firstOrNull()
+                if (place != null) {
                     Text("País: ${response!!.country}")
                     Text("Código Postal: ${response!!.postCode}")
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("Lugar: ${place.placeName}")
+                    Text("Estado: ${place.state}")
+                    Text("Latitud: ${place.latitude}")
+                    Text("Longitud: ${place.longitude}")
+                }
 
-                    response!!.places.forEach { place ->
-                        Text("Lugar: ${place.placeName}")
-                        Text("Estado: ${place.state}")
-                        Text("Latitud: ${place.latitude}")
-                        Text("Longitud: ${place.longitude}")
+                Spacer(modifier = Modifier.height(16.dp))
+
+                GoogleMap(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp),
+                    cameraPositionState = cameraPositionState
+                ) {
+                    place?.let {
+                        val latitude = it.latitude.toDoubleOrNull()
+                        val longitude = it.longitude.toDoubleOrNull()
+                        if (latitude != null && longitude != null) {
+                            val markerState = rememberMarkerState(position = LatLng(latitude, longitude))
+
+                            Marker(
+                                state = markerState,
+                                title = it.placeName,
+                                snippet = "Estado: ${it.state}"
+                            )
+                        }
                     }
                 }
             } else if (error.isNotEmpty()) {
-                Text(text = error, color = MaterialTheme.colorScheme.error)
+                Text(text = error, color = MaterialTheme.colorScheme.error, modifier = Modifier.align(Alignment.CenterHorizontally))
             } else {
-                CircularProgressIndicator()
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             }
         }
     }
